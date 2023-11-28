@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="css/style.css">			
+
+    </head>
+	<body>
+		<div class="header" style="vertical-align: middle;">
+			<header>
+				<div class="header-product">
+				<p>&nbsp;<strong style="font-family: 'IBM Plex Sans Semi Bold';">Aggregator</strong></p>
+				</div>
+				<div class="header-seperator">
+				</div>
+				<div class="header-buttons">
+					<button class="header-button" id="Authenticate">Accounts</button>
+				</div>
+			</header>
+		</div>
+
+		<div>
+			<div id="authenticate">
+				<div>
+
+                    <!--AddList-->
+					<br/>
+					<button onclick="linkAccount();">Link Accounts</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+
+            function linkAccount()
+			 {
+				console.log("In linkAccount()");
+				const searchString = window.location.search;
+				console.log("Using searchString="+searchString);
+				const newUrl = window.location.origin+'/add'+searchString;
+				console.log("Using url: "+newUrl);
+				window.location.replace(newUrl);
+			 }
+
+		</script>
+	</body>

@@ -1,0 +1,70 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: authentication
+  labels:
+    app: authentication
+    app.kubernetes.io/component: authentication
+    app.kubernetes.io/instance: authentication
+    app.kubernetes.io/name: authentication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: authentication
+  template:
+    metadata:
+      labels:
+        deployment: authentication
+    spec:
+      containers:
+        - name: authentication
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/{{NAMESPACE}}/authentication:latest
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+          env:
+            - name: INSTANA_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: 1
+            limits:
+              memory: "2048Mi"
+              cpu: 2
+          livenessProbe:
+            tcpSocket:
+              port: 8443
+            initialDelaySeconds: 60
+            periodSeconds: 5 
+            failureThreshold: 5 
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

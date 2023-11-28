@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  title: Audit
+  version: 1.0.0
+  description: Audit
+  x-ibm-name: audit
+paths:
+  /:
+    post:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: string
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              title: auditlog
+              properties:
+                message:
+                  type: string
+x-ibm-configuration:
+  properties:
+    target-url:
+      value: http://banking:8000/audit/v1
+      description: URL of the proxy policy
+      encoded: false
+  cors:
+    enabled: true
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          version: 2.0.0
+          verb: keep
+          target-url: $(target-url)/$(request.path)
+          follow-redirects: false
+          timeout: 60
+          parameter-control:
+            type: blocklist
+          header-control:
+            type: blocklist
+            values:
+              - ^X-IBM-Client-Id$
+          inject-proxy-headers: true
+          persistent-connection: true
+    finally: []
+  activity-log:
+    enabled: true
+    success-content: activity
+    error-content: payload
+servers:
+  - url: /audit

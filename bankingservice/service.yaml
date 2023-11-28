@@ -1,0 +1,21 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: banking
+  labels:
+    app: banking
+spec:
+  ports:
+    - name: 8000-tcp
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+    - name: 8443-tcp
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: ClusterIP
+  sessionAffinity: None
+  selector:
+    deployment: banking
+

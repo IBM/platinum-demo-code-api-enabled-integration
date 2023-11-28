@@ -62,22 +62,6 @@ rm $SCRIPT_DIR/setupResources/apic-operator-subscription.yaml
 
 wait_for_operator_start ibm-apiconnect $namespace
 
-cat $SCRIPT_DIR/setupResources/appconnect-operator-subscription.yaml_template |
-  sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/setupResources/appconnect-operator-subscription.yaml
+sleep 30s
 
-oc apply -f $SCRIPT_DIR/setupResources/appconnect-operator-subscription.yaml
-
-rm $SCRIPT_DIR/setupResources/appconnect-operator-subscription.yaml
-
-wait_for_operator_start ibm-appconnect  $namespace
-
-cat $SCRIPT_DIR/setupResources/assetrepo-operator-subscription.yaml_template |
-  sed "s#{{NAMESPACE}}#$namespace#g;" > $SCRIPT_DIR/setupResources/assetrepo-operator-subscription.yaml
-
-oc apply -f $SCRIPT_DIR/setupResources/assetrepo-operator-subscription.yaml
-
-rm $SCRIPT_DIR/setupResources/assetrepo-operator-subscription.yaml
-
-wait_for_operator_start ibm-integration-asset-repository  $namespace
-
-echo "Completed installation of API Connect, App Connect and Asset Repo operators successfully"
+echo "Completed installation of API Connect operator successfully"

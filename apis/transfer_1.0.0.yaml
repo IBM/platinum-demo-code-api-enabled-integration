@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  title: Transfer
+  version: 1.0.0
+  description: Transfer
+  x-ibm-name: transfer
+paths:
+  /:
+    post:
+      responses:
+        '200':
+          description: success
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transfer'
+components:
+  schemas:
+    Transfer:
+      type: object
+      properties:
+        sourceAccount:
+          type: integer
+        targetAccount:
+          type: integer
+        amount:
+          type: string
+x-ibm-configuration:
+  cors:
+    enabled: true
+  properties:
+    target-url:
+      value: http://banking:8000/transferfunds/v1
+      description: The URL of the target service
+      encoded: false
+  phase: realized
+  enforced: true
+  gateway: datapower-api-gateway
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          version: 2.0.0
+          verb: keep
+          target-url: $(target-url)/$(request.path)
+          follow-redirects: false
+          timeout: 60
+          parameter-control:
+            type: blocklist
+          header-control:
+            type: blocklist
+            values:
+              - ^X-IBM-Client-Id$
+              - ^X-Instana-s$
+          inject-proxy-headers: true
+          persistent-connection: true
+    finally: []
+  type: rest
+  testable: true
+  activity-log:
+    enabled: true
+    success-content: activity
+    error-content: payload
+servers:
+  - url: /transfer

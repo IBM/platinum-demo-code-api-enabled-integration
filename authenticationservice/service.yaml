@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: authentication
+  labels:
+    app: authentication
+spec:
+  ports:
+    - name: 8443-tcp
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: ClusterIP
+  sessionAffinity: None
+  selector:
+    deployment: authentication
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: authentication
+  labels:
+    app.kubernetes.io/component: http
+    app.kubernetes.io/instance: authentication
+    app.kubernetes.io/name: authentication
+    release: authentication
+spec:
+  to:
+    kind: Service
+    name: authentication
+    weight: 100
+  port:
+    targetPort: 8443
+  tls:
+    termination: passthrough
+  wildcardPolicy: None
+

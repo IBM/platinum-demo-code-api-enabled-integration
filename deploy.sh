@@ -55,7 +55,7 @@ while [ $SECONDS -lt $END ]; do
       API_CONNECT=SUCCESS
       break
     else
-      echo "Waiting for API Connect to be available"
+      echo "Waiting for API Connect to be available - this may take 60 minutes to complete"
       sleep 60
     fi
 done
@@ -70,65 +70,26 @@ fi
 
 line_separator "SUCCESS - INSTALLING API CONNECT"
 
+line_separator "START - INSTALLING BANK SERVICE"
 
-echo ""
-line_separator "START - INSTALLING ASSET REPO"
+cd $SCRIPT_DIR/bankingservice
 
-cat $SCRIPT_DIR/setupResources/assetrepo.yaml_template |
-  sed "s#{{NAMESPACE}}#$NAMESPACE#g;" |
-  sed "s#{{FILE_STORAGE}}#$FILE_STORAGE#g;" |
-  sed "s#{{BLOCK_STORAGE}}#$BLOCK_STORAGE#g;" > $SCRIPT_DIR/setupResources/assetrepo.yaml
+./deploy.sh $NAMESPACE
 
-oc apply -f setupResources/assetrepo.yaml
+cd $SCRIPT_DIR/apiloadgenerator
 
+./deploy.sh $NAMESPACE
 
-END=$((SECONDS+3600))
-AR=FAILED
-while [ $SECONDS -lt $END ]; do
-    AR_PHASE=$(oc get AssetRepository assetrepo -o=jsonpath={'..phase'})
-    if [[ $AR_PHASE == "Ready" ]]
-    then
-      echo "Asset Repo available"
-      AR=SUCCESS
-      break
-    else
-      echo "Waiting for Asset Repo to be available"
-      sleep 60
-    fi
-done
-sleep 60 
-line_separator "SUCCESS - ASSET REPO CREATED"
+cd $SCRIPT_DIR/authenticationservice
 
-echo ""
-line_separator "START - INSTALLING IBM APP CONNECT"
+./deploy.sh $NAMESPACE
 
-cat $SCRIPT_DIR/setupResources/appconnect-dashboard.yaml_template |
-  sed "s#{{NAMESPACE}}#$NAMESPACE#g;" |
-  sed "s#{{FILE_STORAGE}}#$FILE_STORAGE#g;" |
-  sed "s#{{BLOCK_STORAGE}}#$BLOCK_STORAGE#g;" > $SCRIPT_DIR/setupResources/appconnect-dashboard.yaml
+cd $SCRIPT_DIR
 
-oc apply -f setupResources/appconnect-dashboard.yaml
-
-
-END=$((SECONDS+3600))
-APP_CONNECT=FAILED
-while [ $SECONDS -lt $END ]; do
-    APP_CONNECT_PHASE=$(oc get DesignerAuthoring ace-designer-demo -o=jsonpath={'..phase'})
-    if [[ $APP_CONNECT_PHASE == "Ready" ]]
-    then
-      echo "App Connect available"
-      APP_CONNECT=SUCCESS
-      break
-    else
-      echo "Waiting for App Connect to be available"
-      sleep 60
-    fi
-done
-
-line_separator "SUCCESS - IBM APP CONNECT CREATED"
+line_separator "SUCCESS - INSTALLING BANK SERVICE"
 
 ./configure-apiconnect.sh -n $NAMESPACE -r $API_CONNECT_CLUSTER_NAME
-./configure-assetrepo.sh -n $NAMESPACE -r assetrepo
+
 echo ""
 echo ""
 line_separator "User Interfaces"

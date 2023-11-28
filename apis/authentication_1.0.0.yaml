@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: Authentication
+  version: 1.0.0
+  description: Authentication
+  x-ibm-name: authentication
+paths:
+  /:
+    post:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                title: token
+                properties:
+                  token:
+                    type: string
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: credenitals
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+x-ibm-configuration:
+  cors:
+    enabled: true
+  properties:
+    target-url:
+      value: http://banking:8000/authentication/v1
+      description: The URL of the target service
+      encoded: false
+  phase: realized
+  enforced: true
+  gateway: datapower-api-gateway
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          version: 2.0.0
+          verb: keep
+          target-url: $(target-url)/$(request.path)
+          follow-redirects: false
+          timeout: 60
+          parameter-control:
+            type: blocklist
+          header-control:
+            type: blocklist
+            values:
+              - ^X-IBM-Client-Id$
+              - ^X-Instana-s$
+              - ^X-Instana-t$
+              - ^x-instana-l$
+          inject-proxy-headers: true
+          persistent-connection: true
+    finally: []
+  type: rest
+  testable: true
+  activity-log:
+    enabled: true
+    success-content: activity
+    error-content: payload
+servers:
+  - url: /authentication

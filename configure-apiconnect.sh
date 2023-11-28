@@ -232,6 +232,27 @@ function add_catalog() {
   return 0
 }
 
+function publishAPI() {
+
+  token=${1}
+  org_name=${2}
+  catalog=${3}
+  api=${4}
+  product=${5}
+  current_dir=$(dirname $0)
+
+  # Publish product
+  echo "[INFO]  Publishing product..."
+  RES=$(curl -kLsS -X POST https://${API_EP}/api/catalogs/${org_name}/${catalog}/publish \
+    -H "accept: application/json" \
+    -H "authorization: Bearer ${token}" \
+    -H "content-type: multipart/form-data" \
+    -F "openapi=@${current_dir}/apis/${api};type=application/yaml" \
+    -F "product=@${current_dir}/products/${product};type=application/yaml")
+  handle_res "${RES}"
+  echo -e "[INFO]  ${TICK} Product published"
+}
+
 function handle_res() {
   local body=$1
   local status=$(echo ${body} | jq -r ".status")
@@ -349,6 +370,14 @@ for i in $(seq 1 60); do
     sleep 60
   fi
 done
+
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "audit_1.0.0.yaml" "auditproduct.yaml"
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "authentication_1.0.0.yaml" "authenticationproduct.yaml"
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "balance_1.0.0.yaml" "balanceproduct.yaml"
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "frauddetection_1.0.0.yaml" "frauddetectionproduct.yaml"
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "notification_1.0.0.yaml" "notificationproduct.yaml"
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "transfer_1.0.0.yaml" "transferproduct.yaml"
+publishAPI "${provider_token}" "${ORG_NAME}" "${MAIN_CATALOG}" "bankingservices_1.0.0.yaml" "bankservicesproduct.yaml"
 
 API_MANAGER_USER=$(echo $PROVIDER_CREDENTIALS | jq -r .username | base64 --decode)
 API_MANAGER_PASS=$(echo $PROVIDER_CREDENTIALS | jq -r .password | base64 --decode)

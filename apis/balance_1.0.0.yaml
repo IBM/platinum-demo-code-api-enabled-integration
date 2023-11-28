@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: Balance
+  version: 1.0.0
+  description: Balance
+  x-ibm-name: balance
+paths:
+  /{accountNumber}:
+    get:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                title: balance
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                  amount:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      currency:
+                        type: string
+                  creditDebitIndicator:
+                    type: string
+                  dateTime:
+                    type: string
+      parameters:
+        - name: accountNumber
+          in: path
+          schema:
+            type: string
+          required: true
+x-ibm-configuration:
+  cors:
+    enabled: true
+  properties:
+    target-url:
+      value: http://banking:8000/balance/v1
+      description: The URL of the target service
+      encoded: false
+  phase: realized
+  enforced: true
+  gateway: datapower-api-gateway
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          version: 2.0.0
+          verb: keep
+          target-url: $(target-url)/$(request.path)
+          follow-redirects: false
+          timeout: 60
+          parameter-control:
+            type: blocklist
+          header-control:
+            type: blocklist
+            values:
+              - ^X-IBM-Client-Id$
+              - ^X-Instana-s$
+              - ^X-Instana-t$
+              - ^x-instana-l$
+              - ^traceparent$
+              - ^tracestate$
+          inject-proxy-headers: true
+          persistent-connection: true
+    finally: []
+  type: rest
+  testable: true
+  activity-log:
+    enabled: true
+    success-content: activity
+    error-content: payload
+servers:
+  - url: /balance

@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: BankingServices
+  version: 1.0.0
+  description: BankingServices
+  x-ibm-name: bankingservices
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Services'
+components:
+  schemas:
+    Services:
+      type: object
+      properties:
+        Products:
+          type: array
+          items:
+            type: object
+            properties: 
+              ProductId:
+                type: string
+              ProductType:
+                type: string
+              ProductName: 
+                type: string
+              Link:
+                type: string
+x-ibm-configuration:
+  cors:
+    enabled: true
+  properties:
+    target-url:
+      value: http://banking:8000/bankingservices/v1
+      description: The URL of the target service
+      encoded: false
+  phase: realized
+  enforced: true
+  gateway: datapower-api-gateway
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          version: 2.0.0
+          verb: keep
+          target-url: $(target-url)/$(request.path)
+          follow-redirects: false
+          timeout: 60
+          parameter-control:
+            type: blocklist
+          header-control:
+            type: blocklist
+            values:
+              - ^X-IBM-Client-Id$
+              - ^X-Instana-s$
+          inject-proxy-headers: true
+          persistent-connection: true
+    finally: []
+  type: rest
+  testable: true
+  activity-log:
+    enabled: true
+    success-content: activity
+    error-content: payload
+servers:
+  - url: /bankingservices

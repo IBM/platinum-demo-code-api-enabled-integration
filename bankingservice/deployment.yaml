@@ -1,0 +1,62 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: banking
+  labels:
+    app: banking
+    app.kubernetes.io/component: banking
+    app.kubernetes.io/instance: banking
+    app.kubernetes.io/name: banking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: banking
+  template:
+    metadata:
+      labels:
+        deployment: banking
+    spec:
+      containers:
+        - name: banking
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/cp4i/banking:latest
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+          env:
+            - name: INSTANA_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: 1
+            limits:
+              memory: "2048Mi"
+              cpu: 2
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 5 
+            failureThreshold: 5 
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

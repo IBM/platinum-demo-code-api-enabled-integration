@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: aggregator
+  labels:
+    app: aggregator
+spec:
+  ports:
+    - name: 8443-tcp
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: ClusterIP
+  sessionAffinity: None
+  selector:
+    deployment: aggregator
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: aggregator
+  labels:
+    app.kubernetes.io/component: http
+    app.kubernetes.io/instance: aggregator
+    app.kubernetes.io/name: aggregator
+    release: aggregator
+spec:
+  to:
+    kind: Service
+    name: aggregator
+    weight: 100
+  port:
+    targetPort: 8443
+  tls:
+    termination: passthrough
+  wildcardPolicy: None
+
