@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js & plugin-->
+<script src="https://d3js.org/d3.v7.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<link rel="stylesheet" href="css/style.css">
+
+<div class="header" style="vertical-align: middle;">
+    <header>
+        <div class="header-product">
+        <p>IBM &nbsp;<strong style="font-family: 'IBM Plex Sans Semi Bold';">Platinum Demo</strong></p>
+        </div>
+        <div class="header-seperator">
+        </div>
+        <div class="header-buttons">
+            <button class="header-button" id="Monitor">OAuth flow</button>
+        </div>
+        <div class="refresh-buttons">
+            <button onclick="drawMessages()" class="refresh-button">Refresh Data</button>
+        </div>
+    </header>
+</div>
+
+<!-- Create a div where the graph will take place -->
+<div class="body">
+    <div class="drawArea" id="drawArea">
+    </div>
+    <div class="controls">
+        <div id="httpDetails">
+            <div class="httpLabel">
+                <bold>HTTP viewer</bold></br><text id="httpLabel"></text>
+            </div>
+            <div id="httpGeneral">
+                <button type="button" class="collapsible" onclick="collapse(this)">General</button>
+                <div class="collapsible-content">
+                    <div class="contentLabel">Request URL</div>
+                    <div class="urlString" id="urlString"></div>
+                    <div class="contentLabel">Request Method</div>
+                    <div id="httpMethod"></div>
+                    <div class="contentLabel">Status Code</div>
+                    <div id="statusCode"></div>
+                </div>
+            </div>
+            <div id="httpUrl">
+                <button type="button" class="collapsible" onclick="collapse(this);">URL parameters</button>
+                <div class="collapsible-content" id="urlParameters">
+                </div>
+            </div>
+            <div>
+                <button type="button" class="collapsible" onclick="collapse(this)">HTTP headers</button>
+                <div class="collapsible-content" id="httpHeaders">
+                </div>
+            </div>
+            <div>
+                <button type="button" class="collapsible" onclick="collapse(this)">Body</button>
+                <div class="collapsible-content" id="httpBody">
+                </div>
+            </div>
+        </div> 
+
+        
+    </div>
+</div>
+
+<script>
+
+var classes = ["End user", "Aggregator", "API Gateway", "Bank Auth", "Balance Service"];
+
+//var messages = [{start: 0, end: 1, message: "Login In", code: "", url: "https://ademo-gw-gateway-cp4i.apps.daffy-6bom7bh1.cloud.techzone.ibm.com/ibm-demo/sandbox/testoauth/oauth2/authorize?response_type=code&redirect_uri=https://banking:8443/redirect&scope=balance&client_id=71a96121fb98a84f20e6cee0aca8ae59&brand=abc&channel=retail", "headers": {"Authorization":"Basic ZWRkNTg0M2QxNGZkMjNlOTUxOWQyZDU5ZDM1ZWI2NWE6YTBiNGZkYzExMzQzYzAwYzQwN2U4YjZjYWFkZDM5ODc=", "secondHeader": "secondValue"}, "body": "sometext in the body"}, 
+//                {start: 1, end: 2, message: "Request authorization"}, 
+//                {start: 2, end: 1, message: "Something else"}];
+
+var messages = [];
+
+var XPAD = 80;
+var YPAD = 20;
+var VERT_SPACE = 200;
+var VERT_PAD = 60;
+
+var CLASS_WIDTH = 140;
+var CLASS_HEIGHT = 40;
+var CLASS_LABEL_X_OFFSET = -30;
+var CLASS_LABEL_Y_OFFSET = 25;
+
+var MESSAGE_SPACE = 40;
+var MESSAGE_LABEL_X_OFFSET = -40;
+var MESSAGE_LABEL_Y_OFFSET = 73;
+var MESSAGE_ARROW_Y_OFFSET = 80;
+
+var CANVAS_WIDTH = 1000;
+var CANVAS_HEIGHT = 1000;
+
+drawBlankDiagram();
+
+function drawBlankDiagram()
+{
+    var drawArea = document.getElementById("drawArea");
+    if(drawArea && drawArea.firstChild)
+    {
+        while (drawArea.firstChild) {
+            console.log("removing child");
+            drawArea.removeChild(drawArea.lastChild);
+        }
+    }
+    
+    // Create an svg canvas
+    var svg = d3.select("#drawArea")
+        .append("svg")
+        .attr("width", CANVAS_WIDTH)
+        .attr("id", "sequenceDiagram")
+        .attr("height", CANVAS_HEIGHT);
+
+    // Draw vertical lines
+    classes.forEach(function(c, i) {
+        var line = svg.append("line")
+        .style("stroke", "#888")
+        .attr("x1", XPAD + i * VERT_SPACE)
+        .attr("y1", YPAD)
+        .attr("x2", XPAD + i * VERT_SPACE)
+        .attr("y2", CANVAS_HEIGHT);  
+    });
+        
+    // Draw classes
+    classes.forEach(function(c, i) {
+        var x = XPAD + i * VERT_SPACE;
+        var g1 = svg.append("g")
+        .attr("transform", "translate(" + x + "," + YPAD + ")")
+        .attr("class", "first")
+        .append("rect")
+        .style("x", -CLASS_WIDTH/2)
+        .style("y", "0")
+        .style("width", CLASS_WIDTH)
+        .style("height", CLASS_HEIGHT)
+        .style("fill", "#000000")
+    });
+
+    // Draw class labels
+    classes.forEach(function(c, i) {
+        var x = XPAD + i * VERT_SPACE;
+        var g1 = svg.append("g")
+        .attr("transform", "translate(" + x + "," + YPAD + ")")
+        .attr("class", "first")
+        .append("text")
+        .text(function (d) { return c; })
+        .attr("dx", (-(c.length)*3.8))
+        .attr("dy", CLASS_LABEL_Y_OFFSET)
+        .style("fill", "#FFFFFF");
+    });
+}
+
+
+function drawMessages()
+{
+    drawBlankDiagram();
+
+    messages = getMessageData();
+
+    var svg = d3.select("#sequenceDiagram");
+
+    // Hidden rect for clicking 
+    messages.forEach(function(m, i) {
+        var x=0;
+        var width=0;
+        if(m.end<m.start)
+        {
+            x = XPAD + (m.end) * VERT_SPACE;
+            width = (m.start - m.end)*VERT_SPACE;
+        }
+        else
+        {
+            x = XPAD + (m.start) * VERT_SPACE;
+            width = (m.end - m.start)*VERT_SPACE;
+        }
+        var y = 20+YPAD + CLASS_HEIGHT + i * MESSAGE_SPACE;
+        
+        var g1 = svg.append("g")
+            .attr("class", "first")
+            .append("rect")
+            .attr("id", "line"+i)
+            .attr("item", i)
+            .on("click", clickedLine)
+            .style("x",x)
+            .style("y", y)
+            .style("width", width)
+            .style("height", 40)
+            .style("fill-opacity", "0")
+        
+    });
+
+    // Draw message arrows
+    messages.forEach(function(m, i) {
+    var y = YPAD + MESSAGE_ARROW_Y_OFFSET + i * MESSAGE_SPACE;
+    var line = svg.append("line")
+        .style("stroke", "black")
+        .attr("x1", XPAD + m.start * VERT_SPACE)
+        .attr("y1", y)
+        .attr("x2", XPAD + m.end * VERT_SPACE)
+        .attr("y2", y)
+        .attr("marker-end", "url(#end)")
+        .append("text")
+        .text(function (d) { return m.message; });
+    });
+
+
+
+    // Draw message labels
+    messages.forEach(function(m, i) {
+    //var xPos = XPAD + MESSAGE_LABEL_X_OFFSET + (((m.end - m.start) * VERT_SPACE) / 2) + (m.start * VERT_SPACE);
+    var xPos = XPAD + (m.start * VERT_SPACE) +(((m.end - m.start) * VERT_SPACE) / 2)-((m.message.length)*3.5);
+    var yPos = YPAD + MESSAGE_LABEL_Y_OFFSET + i * MESSAGE_SPACE;
+    
+    var g1 = svg.append("g")
+        .attr("transform", "translate(" + xPos + "," + yPos + ")")
+        .attr("class", "first")
+        .attr("id", "label"+i)
+        .append("text")
+        .text(function (d) { return m.message; });
+    });
+
+    // Arrow style
+    svg.append("svg:defs").selectAll("marker")
+        .data(["end"])      
+    .enter().append("svg:marker")
+        .attr("id", String)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 10)
+        .attr("refY", 0)
+        .attr("markerWidth", 10)
+        .attr("markerHeight", 10)
+        .attr("orient", "auto")
+    .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5");
+    
+
+    //d3.select("#line1")
+    //  .on("click", function(){clickedLine(this.attributes.getNamedItem("item").value);})
+}
+
+function getMessageData()
+{
+    var origin = this.location.origin;
+    const url=origin+"/getData";
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false);
+    xhr.send(null);
+    if (xhr.status === 200) {
+      
+      console.log(xhr.responseText);
+      var jsonData = JSON.parse(xhr.responseText);
+      return jsonData;
+    } else {
+      throw new Error('Request failed: ' + xhr.statusText);
+    }
+
+}
+
+
+function clickedLine(event)
+{
+	console.log("clicked line");
+	var item = event.currentTarget.attributes.getNamedItem("item").value;
+	var label = document.getElementById("httpLabel");
+	var urlString = document.getElementById("urlString");
+	var headers = document.getElementById("httpHeaders");
+    var urlParameters = document.getElementById("urlParameters");
+	var body = document.getElementById("httpBody");
+    var statusCode = document.getElementById("statusCode");
+    var httpMethod = document.getElementById("httpMethod");
+
+	label.innerHTML = messages[item].message;
+	urlString.innerHTML = messages[item].url;
+    var urlParametersObject = getUrlParameters(messages[item].url);
+    urlParameters.innerHTML = jsonObjectFormatting(urlParametersObject);
+    headers.innerHTML = jsonObjectFormatting(messages[item].headers);
+	body.innerHTML = JSON.stringify(messages[item].body, null, 2);
+    statusCode.innerHTML = messages[item].code;
+    httpMethod.innerHTML = messages[item].method;
+}
+
+function jsonObjectFormatting(json) {
+    var response="";
+    for (const key in json){
+      response += "<div class=\"urlParameter\"><text class=\"boldText\">"+key + "</text>: " + json[key]+"</div>";
+      console.log(`${key} : ${json[key]}`);
+    }
+    return response;
+}
+
+function collapse(event) {
+    console.log("starting collapse");
+    event.classList.toggle("active");
+    var content = event.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+    
+  }
+
+  function getUrlParameters(url){
+    console.log("Getting Url Parameters url="+url);
+    var tracedUrl = new URL(url);
+    var searchString = tracedUrl.search;
+    console.log("Search string="+searchString);
+    const urlParams = new URLSearchParams(searchString);
+    const result = {}
+    for(const [key, value] of urlParams) { // each 'entry' is a [key, value] tupple
+      result[key] = value;
+    }
+    return result;
+  }
+</script>

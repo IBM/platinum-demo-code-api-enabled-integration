@@ -1,5 +1,6 @@
 const fs = require("fs");
 const url = require("url");
+var syncrequest = require('sync-request');
 
 const host = 'localhost';
 const port = 8443;
@@ -32,6 +33,10 @@ const requestListener = function(req, res){
       
       else if(req.url.startsWith('/login'))
       {
+        let gatewayRedirect = "https://authentication-cp4i."+process.env.HOSTNAME+req.url;
+        sendTrace(2, 0, "Redirect bank login", "302", gatewayRedirect, {}, body, "GET");
+        sendTrace(0, 3, "Bank login", "", gatewayRedirect, req.headers, body, "GET");
+        sendTrace(3, 0, "Login screen", "200", gatewayRedirect, {}, "Login screen HTML not shown", "GET");
         let responseBody = fs.readFileSync("login.html")
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
@@ -40,6 +45,8 @@ const requestListener = function(req, res){
       }
       else if(req.url.startsWith('/authcheck'))
       {
+        let gatewayRedirect = "https://authentication-cp4i."+process.env.HOSTNAME+req.url;
+        sendTrace(0, 3, "Auth checks", "", gatewayRedirect, req.headers, body, req.method);
         let responseBody = fs.readFileSync("consent.html")
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
@@ -49,6 +56,7 @@ const requestListener = function(req, res){
 
       else if(req.url.startsWith('/redirect'))
       {
+
         console.log("Redirect========ENTRY=====")
         var parsedURL = url.parse(req.url, true);
         console.log("redirect: parsedURL="+JSON.stringify(parsedURL));
@@ -62,6 +70,8 @@ const requestListener = function(req, res){
           'Location': redirectURL,
           'APIm-debug': true
         });
+        sendTrace(3, 0, "Accepted - redirect to OAuth", "", redirectURL, {}, body, req.method);
+        sendTrace(0, 2, "OAuth authorize with confirmationID", "", redirectURL, {}, body, req.method);
         res.end();
       }
 
@@ -82,9 +92,11 @@ const requestListener = function(req, res){
       {
         var parsedURL = url.parse(req.url, true);
         console.log("authorizationurl: parsedURL="+JSON.stringify(parsedURL));
-
+        let traceUrl = "https://authentication-cp4i."+process.env.HOSTNAME+req.url;
+        sendTrace(2, 3, "Verify confirmationID", "", traceUrl, req.headers, body, req.method);
         res.writeHead(200);
         res.end();
+        sendTrace(3, 2, "Confirmed", "200", traceUrl, res.headers, "", req.method);
       }
       else
       {
@@ -133,3 +145,24 @@ https.createServer(
     console.log('listen port 8443');
   }
 )
+
+function sendTrace(startPosition, endPosition, message, code, url, headers, body, method){
+  console.log("Starting "+message+ " trace call");
+
+  var res = syncrequest('POST', 'http://oauthviewer:8000/postData', {
+        json: {
+          start: startPosition,
+          end: endPosition, 
+          message: message, 
+          code: code,
+          url: url,
+          headers: headers, 
+          body: body,
+          method: method
+        }
+      });
+  var response_body = res.getBody('utf8');
+  console.log("Ending "+message +" with response: "+response_body);
+  return response_body;
+  
+}

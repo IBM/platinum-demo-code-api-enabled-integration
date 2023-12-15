@@ -1,5 +1,6 @@
 const fs = require("fs");
 const url = require("url");
+var syncrequest = require('sync-request');
 
 const host = 'localhost';
 const port = 8443;
@@ -7,10 +8,9 @@ const oauthHostname = "ademo-gw-gateway-cp4i."+process.env.HOSTNAME;
 var redirectAppUrl = "https://aggregator-cp4i."+process.env.HOSTNAME+"/redirect";
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
-const path = "/ibm-demo/sandbox/testoauth/oauth2/"
+const path = "/ibm-demo/sandbox/banking-oauth/oauth2/"
 
 const https = require("https");
-const { query } = require("express");
 
 const requestListener = function(originalReq, originalRes){
     console.log("Path: "+originalReq.url + " method: "+originalReq.method);
@@ -35,11 +35,13 @@ const requestListener = function(originalReq, originalRes){
       }
       else if(originalReq.url.startsWith('/authcheck'))
       {
-        let responseBody = fs.readFileSync("accounts.html")
+        sendTrace(0, 1, "Aggregator auth checks", "", "https://aggregator-cp4i."+process.env.HOSTNAME+originalReq.url, originalReq.headers, body, "GET");
+        let responseBody = fs.readFileSync("addAccount.html")
         originalRes.setHeader("Content-Type", "text/html");
         originalRes.writeHead(200);
         originalRes.write(responseBody);
         originalRes.end();
+        sendTrace(1, 0, "Accepted", "200", "https://aggregator-cp4i."+process.env.HOSTNAME+originalReq.url, originalRes.headers, body, "GET");
       }
 
       else if(originalReq.url.startsWith('/add'))
@@ -54,6 +56,8 @@ const requestListener = function(originalReq, originalRes){
       else if(originalReq.url.startsWith('/linkbank'))
       {
         console.log("linkbank ========ENTRY=====")
+        sendTrace(0, 1, "Link bank account", "", "https://aggregator-cp4i."+process.env.HOSTNAME+originalReq.url, originalReq.headers, body, "GET");
+        
         var parsedURL = url.parse(originalReq.url, true);
         console.log("linkbank: parsedURL="+JSON.stringify(parsedURL));
         var usernameAggregator = parsedURL.query.usernameAggregator;
@@ -65,11 +69,16 @@ const requestListener = function(originalReq, originalRes){
         originalRes.writeHead(302, {
           'Location': redirectURL
         });
+        sendTrace(1, 0, "Redirect OAuth Service", "302", redirectURL, {}, body, "GET");
+        sendTrace(0, 2, "OAuth authorize", "", redirectURL, "", "", "GET");
         originalRes.end();
       }
       else if(originalReq.url.startsWith('/redirect'))
       {
         console.log("redirect ========ENTRY=====")
+        sendTrace(2, 0, "Redirect with Access Code", "302", "https://aggregator-cp4i."+process.env.HOSTNAME+originalReq.url, {}, body, "GET");
+        sendTrace(0, 1, "Redirect with Access Code", "", "https://aggregator-cp4i."+process.env.HOSTNAME+originalReq.url, originalReq.headers, body, "GET");
+
         var parsedURL = url.parse(originalReq.url, true);
         console.log("redirect: parsedURL="+JSON.stringify(parsedURL));
         console.log("redirect: code="+parsedURL.query.code);
@@ -93,6 +102,8 @@ const requestListener = function(originalReq, originalRes){
 
         console.log("redirect: postData="+postData);
         
+        sendTrace(1, 2, "Request token", "", "https://"+oauthHostname+"443"+path+"token", tokenRequestOptions.headers, postData, "POST");
+        
         var tokenRequest = https.request(tokenRequestOptions, tokenResponse => {
           let data = [];
           console.log('redirect: Status Code:', tokenResponse.statusCode);
@@ -108,10 +119,13 @@ const requestListener = function(originalReq, originalRes){
             
             var bearerToken = "Bearer "+tokenResponseData.access_token;
             
+            sendTrace(2, 1, "Token", tokenResponse.statusCode, "https://"+oauthHostname+"443"+path+"token", tokenResponse.headers, tokenResponseData, "POST");
+        
+
             const balanceRequestOptions = {
               hostname: oauthHostname,
               port: 443,
-              path: "/ibm-demo/sandbox/testapi/",
+              path: "/ibm-demo/sandbox/balance/00005-6528965",
               method: 'GET',
               headers:{
                 'Authorization': bearerToken,
@@ -120,6 +134,7 @@ const requestListener = function(originalReq, originalRes){
             };
 
             console.log("redirect: balanceRequestOptions="+JSON.stringify(balanceRequestOptions));
+            sendTrace(1, 2, "Get Balance", "", "https://"+oauthHostname+"443"+balanceRequestOptions.path, balanceRequestOptions.headers, "", "GET");
 
             var balanceRequest = https.request(balanceRequestOptions, balanceResponse => {
               let balanceResponseData = [];
@@ -132,13 +147,24 @@ const requestListener = function(originalReq, originalRes){
               balanceResponse.on('end', () => {
                 console.log('balanceResponse ended: balanceResponseData='+balanceResponseData);
 
+                let responseBody = fs.readFileSync("accounts.html").toString();
+
+                responseBody=responseBody.replace('<!--AddList-->', JSON.parse(balanceResponseData).balance);
+                
+                originalRes.setHeader("Content-Type", "text/html");
+                originalRes.writeHead(200);
+                originalRes.write(responseBody);
+                originalRes.end();
+                sendTrace(2, 1, "Balance", "", "https://"+oauthHostname+"443"+balanceRequestOptions.path, balanceResponse.headers, balanceResponseData, "GET");
+                sendTrace(1, 0, "Balance", "", "https://aggregator-cp4i."+process.env.HOSTNAME+originalReq.url, responseBody.headers, balanceResponseData, "GET");
+
               });
             });
 
             balanceRequest.on('error', (error) => {
               console.log('Error: ', error.message);
             });
-            
+
             balanceRequest.end();
 
           });
@@ -152,11 +178,6 @@ const requestListener = function(originalReq, originalRes){
         tokenRequest.write(postData);
         tokenRequest.end();
 
-        let responseBody = fs.readFileSync("accounts.html");
-        originalRes.setHeader("Content-Type", "text/html");
-        originalRes.writeHead(200);
-        originalRes.write(responseBody);
-        originalRes.end();
       }
       else
       {
@@ -206,3 +227,25 @@ https.createServer(
     process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
   }
 )
+
+function sendTrace(startPosition, endPosition, message, code, url, headers, body, method){
+  console.log("Starting "+message+ " trace call");
+
+  var res = syncrequest('POST', 'http://oauthviewer:8000/postData', {
+        json: {
+          start: startPosition,
+          end: endPosition, 
+          message: message, 
+          code: code,
+          url: url,
+          headers: headers, 
+          body: body,
+          method: method
+        }
+      });
+  var response_body = res.getBody('utf8');
+  console.log("Ending "+message +" with response: "+response_body);
+  return response_body;
+  
+}
+

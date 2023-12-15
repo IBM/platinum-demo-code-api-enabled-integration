@@ -1,3 +1,4 @@
 setupResources/apic-cluster.yaml
 setupResources/appconnect-dashboard.yaml
 setupResources/assetrepo.yaml
+aggregator/code/package-lock.json

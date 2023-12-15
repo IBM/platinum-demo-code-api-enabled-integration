@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: oauthviewer
+  labels:
+    app: oauthviewer
+spec:
+  ports:
+    - name: 8000-tcp
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
+  sessionAffinity: None
+  selector:
+    deployment: oauthviewer
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: oauthviewer
+  labels:
+    app.kubernetes.io/component: http
+    app.kubernetes.io/instance: oauthviewer
+    app.kubernetes.io/name: oauthviewer
+    release: oauthviewer
+spec:
+  to:
+    kind: Service
+    name: oauthviewer
+    weight: 100
+  port:
+    targetPort: 8000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None
+

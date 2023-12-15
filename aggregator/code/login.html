@@ -2,52 +2,84 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="stylesheet" href="css/style.css">			
-
+		<link rel="stylesheet" href="css/aggregatorStyle.css">			
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     </head>
 	<body>
-		<div class="header" style="vertical-align: middle;">
+		<div class="header">
 			<header>
-				<div class="header-product">
-				<p>&nbsp;<strong style="font-family: 'IBM Plex Sans Semi Bold';">Aggregator</strong></p>
+				<div class="title">
+					<div class="title-image">
+						<img class="title-icon" src="images/aggregatoricon.png">
+					</div>
+					<div class="title-text">BankAggregator</div>
 				</div>
-				<div class="header-seperator">
-				</div>
-				<div class="header-buttons">
-					<button class="header-button" id="Authenticate">Accounts</button>
-				</div>
+				<div class="header-tabs">
+					<div class="header-tab-selected">
+						<button class="header-button-selected">Login</button>
+					</div>
+					<div class="header-tab">
+						<button class="header-button">Accounts</button>
+					</div>
+					<div class="header-tab">
+						<button class="header-button">Link</button>
+					</div>
 			</header>
 		</div>
 
-		<div>
-			<div id="authenticate">
-				<div>
-
-                    <label>Username: </label>
-					<input type="text" id="username">
-					<br/>
-					<label>Password: </label>
-					<input type="password" id="password">
-					</form>
-					<br/>
-					<button onclick="sendLogin();">Log-in</button>
+		<div class="body" id="loginbody">
+			<div class="login">
+				<div class="content">
+					<div class="loginText">Welcome. Please login</div>
+					<div><input id="username" class="username" placeholder="Username"></input></div>
+					<div><input id="password" class="password" placeholder="Password" type="password"></input></div>
+					<div><button class="login-button" onclick="getCode();">Sign in</button></div>
+					<div><input class="checkbox" type="checkbox"><text class="checkbox-text">Remember me</text></input></div>
+					<div class="forgot">Forgot Password</div>
+				</div>
+			</div>
+			<div class="register">
+				<div class="content">
+					<div class="registerText">Start your free trial now</div>
+					<div><input class="firstname" placeholder="First name"></input></div>
+					<div><input class="lastname" placeholder="Last name"></input></div>
+					<div><input class="email" placeholder="Email address"></input></div>
+					<div><button class="register-button">Register</button></div>
 				</div>
 			</div>
 		</div>
 
-		<script>
+		<div class="smsbody" id="smsbody">
+			<div class="smscontent">
+				<div class="sms">
+					<div class="sms-image">
+						<img class="sms-icon" src="images/sms.png">
+					</div>
+					<div class="sms-text">A text message with your code has been sent to the phone number ending 7724</div>
+				</div>
+				<div><input id="username" class="username" placeholder="code"></input></div>
+				<div><button class="login-button" onclick="sendLogin();">Verify</button></div>
+				<div><input class="checkbox" type="checkbox"><text class="remember-text">Don't ask for code again on this computer</text></input></div>
+			</div>
+		</div>
 
-            function sendLogin()
+		<script>
+			function sendLogin()
 			 {
 				console.log("In sendLogin()");
 				const searchString = window.location.search;
 				var username = document.getElementById("username").value;
 				var password = document.getElementById("password").value;
 				console.log("Using searchString="+searchString);
-				const newUrl = window.location.origin+'/authcheck'+searchString+"&usernameAggregator="+username;
+				const newUrl = window.location.origin+'/authcheck'+"?usernameAggregator="+username;
 				console.log("Using url: "+newUrl);
 				window.location.replace(newUrl);
 			 }
 
-		</script>
+			 function getCode()
+			 {
+				document.getElementById("loginbody").style.display = "none";
+				document.getElementById("smsbody").style.display = "flex";
+			 }
+        </script>
 	</body>

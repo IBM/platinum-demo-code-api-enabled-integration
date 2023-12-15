@@ -27,10 +27,8 @@ spec:
             - containerPort: 8443
               protocol: TCP
           env:
-            - name: INSTANA_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
+            - name: HOSTNAME
+              value: {{HOSTNAME}}
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File

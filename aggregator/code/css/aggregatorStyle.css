@@ -1,0 +1,274 @@
+
+.title{
+    height: 60px;
+    font-family: 'Roboto';
+}
+
+.title-image{
+    margin-top: 14px;
+}
+
+.title-icon{
+    
+    height: 40px; 
+    float: left; 
+    margin-left: 24px;
+}
+
+.title-text{
+    margin-top: 10px;
+    font-size: 32px;
+    margin-left: 80px;
+}
+
+.header-tabs{
+    background-color: #FF0000;
+    height: 60px;
+    font-family: 'Roboto';
+}
+
+.header-tab-selected{
+    float: left; 
+    width: 100px;
+    margin-left: 16px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.header-tab{
+    float: left;
+    background-color: #FF0000;
+    color: white; 
+    width: 100px;
+    margin-left: 16px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.header-button-selected{
+    background-color: white;
+    color: black;
+    border: 0px;
+    width: 100px;
+    height: 40px;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.header-button{
+    background-color: #FF0000;
+    color: white; 
+    border: 0px;
+    width: 100px;
+    height: 40px;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.body, .smsbody{
+    display: flex;
+    font-family: 'Roboto';
+}
+
+.linkBody{
+    font-family: 'Roboto';
+}
+
+.bodyText{
+    font-size: 16px;
+}
+
+.smsbody{
+    display: none;
+}
+
+body{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.login{
+    flex: 50%;
+    margin-top: 40px;
+    font-size: 16px;
+    display: flex;
+}
+
+.register{
+    flex: 50%;
+    margin-top: 40px;
+    font-size: 16px;
+    display: flex;
+    border-left-width: 1px;
+    border-left-color: #FF0000;
+    border-left-style: double;
+}
+
+.content{
+    width: 300px;
+    margin: auto;
+}
+
+.loginText, .registerText{
+    margin-bottom: 0px;
+}
+
+.username, .password, .login-button, .register-button, .firstname, .lastname, .email{
+    border: 0px;
+    height: 40px;
+    font-size: 16px;
+    margin-top: 16px;
+}
+
+.username, .password, .firstname, .lastname, .email{
+    background-color: #EEEEEE;
+    color: black; 
+    width: 230px;
+    padding-left: 20px;
+}
+
+.checkbox{
+    margin-top: 16px;
+    margin-bottom: 0px;
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-text{
+    font-size: 12px;
+    margin-left: 5px;
+    vertical-align: text-top;
+}
+
+.forgot{
+    margin-top: 20px;
+    font-size: 12px;
+    color: blue; 
+}
+
+::placeholder {
+    color: #BBBBBB;
+}
+
+.login-button, .register-button{
+    background-color: #FF0000;
+    width: 250px;
+    color: white; 
+}
+
+.sms-image{
+    
+    height: 80px; 
+    float: left; 
+    margin-right: 20px;
+}
+
+.sms-icon{
+    margin-top: 5px;
+    height: 80px;
+}
+
+.smscontent{
+    margin-top: 40px;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sms-text{
+    padding-right: 50px;
+    margin-bottom: 10px;
+}
+
+.remember-text{
+    padding-right: 50px;
+    font-size: 12px;
+    margin-left: 5px;
+    vertical-align: text-top;
+}
+
+.smsalign{
+    flex: 50%;
+    font-size: 16px;
+    display: flex;
+}
+
+.picture{
+    height: 250px;
+    padding-top: 50px;
+    padding-bottom: 30px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bodyText{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 630px;
+    padding-bottom: 50px;
+}
+
+.headingText{
+    padding-left: 100px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.bankicon{
+    width: 50px;
+    padding-left: 100px;
+    padding-right: 30px;
+}
+
+.bank-button{
+    background-color: #FF0000;
+    width: 250px;
+    height: 40px;
+    color: white; 
+    border: 0px;
+    height: 40px;
+    font-size: 16px;
+}
+
+.banklink{
+    display: flex;
+    padding-top: 15px;
+    align-items: center;
+}
+
+.middletext{
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 30px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.account{
+    margin-bottom: 5px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.balance{
+    margin-bottom: 10px;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.bankdetails{
+    margin-left: 100px;
+    margin-top: 50px;
+}
+
+.accountnumber{
+    font-size: 12px;
+}
+
+.bank{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}

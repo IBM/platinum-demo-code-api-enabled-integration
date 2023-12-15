@@ -48,6 +48,14 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 5 
             failureThreshold: 5 
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

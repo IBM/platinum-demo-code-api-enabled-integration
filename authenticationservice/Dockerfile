@@ -17,6 +17,7 @@ COPY code/login.html .
 COPY code/consent.html .
 COPY code/package.json .
 COPY code/css css
+COPY code/images images
 
 CMD [ "node", "app.js" ]
 

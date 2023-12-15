@@ -2,45 +2,45 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="stylesheet" href="css/style.css">			
-
+		<link rel="stylesheet" href="css/aggregatorStyle.css">			
+		<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     </head>
 	<body>
-		<div class="header" style="vertical-align: middle;">
+		<div class="header">
 			<header>
-				<div class="header-product">
-				<p>&nbsp;<strong style="font-family: 'IBM Plex Sans Semi Bold';">Aggregator</strong></p>
+				<div class="title">
+					<div class="title-image">
+						<img class="title-icon" src="images/aggregatoricon.png">
+					</div>
+					<div class="title-text">BankAggregator</div>
 				</div>
-				<div class="header-seperator">
-				</div>
-				<div class="header-buttons">
-					<button class="header-button" id="Authenticate">Accounts</button>
-				</div>
+				<div class="header-tabs">
+					<div class="header-tab">
+						<button class="header-button">Login</button>
+					</div>
+					<div class="header-tab-selected">
+						<button class="header-button-selected">Accounts</button>
+					</div>
+					<div class="header-tab">
+						<button class="header-button">Link</button>
+					</div>
 			</header>
 		</div>
 
-		<div>
-			<div id="authenticate">
-				<div>
-
-                    <!--AddList-->
-					<br/>
-					<button onclick="linkAccount();">Link Accounts</button>
+		<div class="bankdetails">
+			<div class="bank">
+				<div class="bank-image">
+					<img class="sms-icon" src="images/bank.png">
 				</div>
+				<div class="middletext">Focus Bank</div>
 			</div>
+			<div class="account"><text>Checking Account</text></div>
+			<div class="accountnumber">Account: 00005-6528965</div>
+			<div class="balance">Balance: <!--AddList--></div>
+			<div><button class="login-button">Transactions</button></div>
 		</div>
-
+		
 		<script>
 
-            function linkAccount()
-			 {
-				console.log("In linkAccount()");
-				const searchString = window.location.search;
-				console.log("Using searchString="+searchString);
-				const newUrl = window.location.origin+'/add'+searchString;
-				console.log("Using url: "+newUrl);
-				window.location.replace(newUrl);
-			 }
-
-		</script>
+        </script>
 	</body>

@@ -9,6 +9,6 @@
   "author": "Callum Jackson",
   "license": "Apache-2.0",
   "dependencies": {
-    "express": "^4.18.2"
+    "sync-request": "^6.1.0"
   }
 }

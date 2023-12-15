@@ -6,34 +6,50 @@
 
     </head>
 	<body>
-		<div class="header" style="vertical-align: middle;">
-			<header>
-				<div class="header-product">
-				<p>&nbsp;<strong style="font-family: 'IBM Plex Sans Semi Bold';">Focus Bank</strong></p>
-				</div>
-				<div class="header-seperator">
-				</div>
-				<div class="header-buttons">
-					<button class="header-button" id="Authenticate">Authenticate</button>
-				</div>
-			</header>
+		<div class="header">
+			<div class="header-product">Focus Bank</div>
+			<div class="header-seperator"></div>
+			<div class="header-buttons">
+				<button class="header-button" id="Authenticate">Authenticate</button>
+			</div>
 		</div>
 
-		<div>
-			<div id="authenticate">
-				<div>
 
-                    <label>Username: </label>
-					<input type="text" id="username">
-					<br/>
-					<label>Password: </label>
-					<input type="password" id="password">
-					</form>
-					<br/>
-					<button onclick="sendLogin();" onsubmit="sendRequest()">Log-in</button>
+		<div class="body" id="loginbody">
+			<div class="login">
+				<div class="content">
+					<div class="loginText">Welcome. Please login</div>
+					<div><input id="username" class="username" placeholder="Username"></input></div>
+					<div><input id="password" class="password" placeholder="Password" type="password"></input></div>
+					<div><button class="login-button" onclick="getCode();">Sign in</button></div>
+					<div class="remember">
+						<div class="rememebercheckbox"><input type="checkbox"></input></div>
+						<div class="rememebercheckbox-text"><text>Remember me</text></div>
+					</div>
+					<div class="forgot">Forgot Password</div>
 				</div>
 			</div>
 		</div>
+
+		<div class="smsbody" id="smsbody">
+			<div class="login">
+				<div class="smscontent">
+					<div class="sms">
+						<div class="sms-image">
+							<img class="sms-icon" src="images/sms.png">
+						</div>
+						<div class="sms-text">A text message with your code has been sent to the phone number ending 7724</div>
+					</div>
+					<div><input id="username" class="username" placeholder="code"></input></div>
+					<div><button class="login-button" onclick="sendLogin();">Verify</button></div>
+					<div><input class="rememebercheckbox" type="checkbox"><text class="remember-text">Don't ask for code again on this computer</text></input></div>
+				</div>
+			</div>
+			<div class="smsalign">
+
+			</div>
+		</div>
+
 
 		<script>
 
@@ -47,6 +63,12 @@
 				const newUrl = window.location.origin+'/authcheck'+searchString+"&username="+username+"&password="+password;
 				console.log("Using url: "+newUrl);
 				window.location.replace(newUrl);
+			 }
+
+			 function getCode()
+			 {
+				document.getElementById("loginbody").style.display = "none";
+				document.getElementById("smsbody").style.display = "flex";
 			 }
 
 		</script>

@@ -11,16 +11,11 @@ COPY ["code/package.json", "./"]
 RUN npm install --production
 
 COPY code/app.js .
-COPY code/key.pem .
-COPY code/cert.pem .
-COPY code/login.html .
-COPY code/accounts.html .
-COPY code/addAccount.html .
+COPY code/viewer.html .
 COPY code/package.json .
 COPY code/css css
-COPY code/images images
 
 CMD [ "node", "app.js" ]
 
 # Allow traffic on port 8443
-EXPOSE 8443
+EXPOSE 8000

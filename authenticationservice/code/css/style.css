@@ -56,12 +56,14 @@ footer{
     background: #000;
 }
 
-header{
-    font-size: 14px;
-    height: 48px;
+.header{
+    font-size: 20px;
+    height: 60px;
     background-color: #171717;
     color: #fff;
     font-family: "IBM Plex Sans Regular","Helvetica Neue",Arial,sans-serif;
+    display: flex;
+    flex-direction: row;
 }
 
 button{
@@ -88,40 +90,44 @@ center{
     font-family: "IBM Plex Sans Regular","Helvetica Neue",Arial,sans-serif;
 }
 
-.main-body{
-    margin-left: 20px;
+.body, .smsbody{
+    margin-left: 100px;
+    margin-top: 50px;
+    font-family: 'IBM Plex Sans Regular';
+}
+
+.smsbody{
+    display: none;
 }
 
 .header-product{
-    vertical-align: middle; 
-    height: 48px; 
-    margin-left: 16px; 
-    float: left; 
-    margin-right: 32px
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 32px; 
+    margin-right: 48px;
+    font-family: 'IBM Plex Sans Semi Bold';
 }
 
 .header-seperator{
     vertical-align: middle; 
-    height: 26px;
+    height: 40px;
     width: 1px;
-    background-color: #333333;
-    margin-top: 11px;
-    float: left;
+    background-color: #dddddd;
+    margin-top: 10px;
 }
 
 .header-button{
     border: 0px;
-    height: 48px; 
+    height: 60px; 
     margin-left: 16px; 
-    color: #CCCCCC; 
+    color: white; 
     background-color: #171717; 
     font-family: 'IBM Plex Sans Regular'; 
-    font-size: 14px;   
+    font-size: 20px;   
 }
 
 .header-buttons{
-    height: 48px; 
-    float: left; 
+    height: 60px; 
     margin-left: 16px;
 }
 
@@ -162,4 +168,125 @@ center{
 /* Checkbox vanished */
 .checkbox { 
     display : none;
+}
+
+
+.login{
+    flex: 50%;
+    margin-top: 40px;
+    font-size: 16px;
+    display: flex;
+}
+
+.loginText{
+    margin-bottom: 0px;
+}
+
+.username, .password, .login-button{
+    border: 0px;
+    height: 40px;
+    font-size: 16px;
+    margin-top: 16px;
+}
+
+.login-button{
+    margin-bottom: 20px;
+}
+
+.username, .password{
+    background-color: #EEEEEE;
+    color: black; 
+    width: 230px;
+    padding-left: 20px;
+}
+
+
+.rememebercheckbox{   
+    width: 16px;
+    height: 16px;
+}
+
+.rememebercheckbox-text{
+    font-size: 12px;
+    margin-left: 5px;
+    margin-top: 3px;
+    vertical-align: text-top;
+}
+
+.remember{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 2px;
+}
+
+.forgot{
+    margin-top: 20px;
+    font-size: 12px;
+    color: blue; 
+}
+
+.sms-image{
+    
+    height: 80px; 
+    float: left; 
+    margin-right: 20px;
+}
+
+.sms-icon{
+    margin-top: 5px;
+    height: 80px;
+}
+
+.smscontent{
+    width: 320px;
+}
+
+.sms-text{
+    padding-right: 50px;
+    margin-bottom: 10px;
+}
+
+.remember-text{
+    padding-right: 50px;
+    font-size: 12px;
+    margin-left: 5px;
+    vertical-align: text-top;
+}
+
+.smsalign{
+    flex: 50%;
+    margin-top: 40px;
+    font-size: 16px;
+    display: flex;
+}
+
+.authenticate{
+    margin-left: 100px;
+    margin-top: 50px;
+    font-family: 'IBM Plex Sans Regular';
+    width: 300px;
+}
+
+.aggregatorimage{
+    height: 50px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.autheticateTitle{
+    font-size: 20px;
+    text-align: center;
+
+    margin-bottom: 40px;
+}
+
+li{
+    margin-top: 10px;
+}
+
+.authButtons{
+    display: flex;
+    flex-direction: row;
+    margin-top: 50px
 }

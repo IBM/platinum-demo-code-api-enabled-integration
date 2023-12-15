@@ -3,6 +3,7 @@ const https = require("https");
 const fs = require("fs");
 const express = require('express');
 var bodyParser = require('body-parser')
+var syncrequest = require('sync-request');
 
 // Express Initialize
 const app = express();
@@ -86,7 +87,10 @@ app.get('/balance/v1/balance/*', (req,res)=>{
   };
 
   res.header("Content-Type", "application/json");
-  res.send('{"status": "Accepted", "balance": "1234567890"}');
+  var responseBody = '{"status": "Accepted", "balance": "$3,791.54"}';
+  sendTrace(2, 4, "Get Balance", "", "http://banking:8000/balance/v1/balance/00005-6528965", req.headers, "", "GET");
+  sendTrace(4, 2, "Balance", "200", "http://banking:8000/balance/v1/balance/00005-6528965", {}, responseBody, "GET");
+  res.send(responseBody);              
 })
 
 app.post('/audit/v1/audit', (req,res)=>{
@@ -163,3 +167,24 @@ app.post('/transferfunds/v1/transfer', (req,res)=>{
   res.header("Content-Type", "application/json");
   res.send('{"status": "Accepted", "transfer": "1234567890"}');
 })
+
+function sendTrace(startPosition, endPosition, message, code, url, headers, body, method){
+  console.log("Starting "+message+ " trace call");
+
+  var res = syncrequest('POST', 'http://oauthviewer:8000/postData', {
+        json: {
+          start: startPosition,
+          end: endPosition, 
+          message: message, 
+          code: code,
+          url: url,
+          headers: headers, 
+          body: body,
+          method: method
+        }
+      });
+  var response_body = res.getBody('utf8');
+  console.log("Ending "+message +" with response: "+response_body);
+  return response_body;
+  
+}
